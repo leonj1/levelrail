@@ -25,7 +25,7 @@ concurrency:
 jobs:
   analyze-go:
     name: analyze (go)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     permissions:
       security-events: write
       contents: read
@@ -39,7 +39,7 @@ jobs:
 
   analyze-js:
     name: analyze (javascript-typescript)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     permissions:
       security-events: write
       contents: read

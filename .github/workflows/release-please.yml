@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release-please:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     env:
       # A GitHub App token (or, failing that, a personal one) makes the release
       # PR run CI and the tag push trigger release.yml by itself. Without

@@ -15,7 +15,7 @@ concurrency:
 jobs:
   hygiene:
     name: PR hygiene
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 5
     permissions:
       contents: read

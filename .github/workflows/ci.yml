@@ -32,7 +32,7 @@ permissions:
 jobs:
   changes:
     name: Detect changed areas
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 5
     outputs:
       base: ${{ steps.detect.outputs.base }}
@@ -95,7 +95,7 @@ jobs:
     name: Plan Go work
     needs: changes
     if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.go == 'true') }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 10
     outputs:
       scope: ${{ steps.plan.outputs.scope }}
@@ -173,7 +173,7 @@ jobs:
     name: Build, vet
     needs: [changes, plan]
     if: ${{ !cancelled() && needs.plan.result != 'skipped' }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 10
     steps:
       - name: Planning passed
@@ -255,7 +255,7 @@ jobs:
     if: >-
       needs.plan.result == 'success'
       && needs.plan.outputs.has_tests == 'true'
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     # 5 min above the docker/rest lanes' own -timeout=27m (scripts/ci-go-plan.sh):
     # enough slack for checkout/setup/teardown/upload around go test's own budget.
     timeout-minutes: 32
@@ -331,7 +331,7 @@ jobs:
     if: >-
       !cancelled() && (needs.changes.result != 'success' || (needs.changes.outputs.go == 'true'
       && (needs.plan.result != 'success' || contains(needs.plan.outputs.api_checks, 'Test ('))))
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     permissions:
       actions: read
       contents: read
@@ -360,7 +360,7 @@ jobs:
     if: >-
       !cancelled() && (needs.changes.result != 'success' || (needs.changes.outputs.go == 'true'
       && (needs.plan.result != 'success' || contains(needs.plan.outputs.rest_checks, 'Test ('))))
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     permissions:
       actions: read
       contents: read
@@ -392,7 +392,7 @@ jobs:
     if: >-
       needs.plan.result == 'success'
       && needs.plan.outputs.quarantine == 'true'
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     continue-on-error: true
     timeout-minutes: 15
     steps:
@@ -426,7 +426,7 @@ jobs:
     if: >-
       !cancelled() && (needs.changes.result != 'success' || (needs.changes.outputs.go == 'true'
       && (needs.plan.result != 'success' || needs.plan.outputs.has_tests == 'true')))
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 5
     env:
       COVERAGE: ${{ needs.plan.outputs.coverage }}
@@ -493,7 +493,7 @@ jobs:
     if: >-
       ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.lint != 'none'
       || needs.changes.outputs.workflows == 'true') }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 10
     env:
       LINT: ${{ needs.changes.outputs.lint }}
@@ -564,7 +564,7 @@ jobs:
     name: Kit (vet, lint, test)
     needs: changes
     if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.kit == 'true') }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 10
     env:
       BASE: ${{ needs.changes.outputs.base }}
@@ -621,7 +621,7 @@ jobs:
     name: Terraform provider (vet, test)
     needs: changes
     if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.tfprovider == 'true') }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 10
     steps:
       - name: Change detection passed
@@ -657,7 +657,7 @@ jobs:
     name: Web (tsc, eslint)
     needs: changes
     if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.web != 'none') }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 30
     env:
       WEB: ${{ needs.changes.outputs.web }}
@@ -770,7 +770,7 @@ jobs:
     if: >-
       ${{ !cancelled() && needs.changes.result == 'success'
       && needs.changes.outputs.web == 'full' && needs.changes.outputs.vitest == 'full' }}
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -801,7 +801,7 @@ jobs:
     name: install.sh (${{ matrix.image }})
     needs: changes
     if: needs.changes.outputs.installer == 'true'
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 25
     strategy:
       fail-fast: false
@@ -843,7 +843,7 @@ jobs:
     name: CI required
     needs: [changes, plan, build-vet, lint, kit, tfprovider, test-go, test-api, test-rest, coverage-gate, web-check, web-test, install-sh]
     if: always()
-    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    runs-on: "${{ (vars.CI_RUNNER || 'ubuntu-latest') == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (vars.CI_RUNNER || 'ubuntu-latest') }}"
     timeout-minutes: 3
     steps:
       - name: Evaluate required jobs

@@ -24,7 +24,7 @@ jobs:
   build-web:
     name: Build frontend
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -59,7 +59,7 @@ jobs:
   build-binaries:
     name: Build (linux/${{ matrix.goarch }})
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     needs: build-web
     timeout-minutes: 10
     permissions:
@@ -109,7 +109,7 @@ jobs:
   build-cli-binaries:
     name: Build CLI (${{ matrix.goos }}/${{ matrix.goarch }})
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 20
     permissions:
       contents: read
@@ -154,7 +154,7 @@ jobs:
   build-agent-binaries:
     name: Build agent (linux/${{ matrix.goarch }})
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -190,7 +190,7 @@ jobs:
   build-agent-packages:
     name: Package agent (linux/${{ matrix.goarch }})
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     needs: build-agent-binaries
     timeout-minutes: 10
     permissions:
@@ -243,7 +243,7 @@ jobs:
   release:
     name: Publish release
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     needs: [build-binaries, build-cli-binaries, build-agent-binaries, build-agent-packages]
     timeout-minutes: 10
     permissions:
@@ -318,7 +318,7 @@ jobs:
     name: Publish CLI to Homebrew
     needs: release
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -365,7 +365,7 @@ jobs:
     # Off until trusted publishing is set up for each package on npmjs.com
     # and the NPM_PUBLISH_ENABLED repo variable is "true" (see docs/ci.md).
     if: (github.event_name == 'workflow_dispatch' || github.ref_type == 'tag') && vars.NPM_PUBLISH_ENABLED == 'true'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 10
     environment: npm-publish
     permissions:
@@ -421,7 +421,7 @@ jobs:
 
   image-channel:
     name: Resolve image tags
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 2
     outputs:
       tags: ${{ steps.resolve.outputs.tags }}
@@ -449,7 +449,7 @@ jobs:
   build-image-levelrail:
     name: Build levelrail image (${{ matrix.platform }})
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ${{ matrix.runner }}
+    runs-on: "${{ (matrix.runner) == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (matrix.runner) == 'ubuntu-24.04-arm' && fromJSON('[\"self-hosted\",\"linux\",\"ARM64\"]') || (matrix.runner) }}"
     timeout-minutes: 20
     permissions:
       contents: read
@@ -516,7 +516,7 @@ jobs:
 
   merge-image-levelrail:
     name: Merge and tag levelrail image
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     needs: [build-image-levelrail, image-channel]
     if: needs.build-image-levelrail.result == 'success'
     timeout-minutes: 10
@@ -571,7 +571,7 @@ jobs:
   build-image-levelrail-agent:
     name: Build levelrail-agent image (${{ matrix.platform }})
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ${{ matrix.runner }}
+    runs-on: "${{ (matrix.runner) == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (matrix.runner) == 'ubuntu-24.04-arm' && fromJSON('[\"self-hosted\",\"linux\",\"ARM64\"]') || (matrix.runner) }}"
     timeout-minutes: 20
     permissions:
       contents: read
@@ -631,7 +631,7 @@ jobs:
 
   merge-image-levelrail-agent:
     name: Merge and tag levelrail-agent image
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     needs: [build-image-levelrail-agent, image-channel]
     if: needs.build-image-levelrail-agent.result == 'success'
     timeout-minutes: 10
@@ -682,7 +682,7 @@ jobs:
   release-notes:
     name: Write release notes
     if: github.event_name == 'workflow_dispatch' || github.ref_type == 'tag'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     needs: [release, merge-image-levelrail, merge-image-levelrail-agent]
     timeout-minutes: 10
     permissions:

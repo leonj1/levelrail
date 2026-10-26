@@ -17,7 +17,7 @@ permissions:
 jobs:
   move:
     name: Move backup tags to main's tip
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     timeout-minutes: 3
     steps:
       - name: Checkout
